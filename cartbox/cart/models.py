@@ -11,6 +11,8 @@ class Category(models.Model):
     class Meta:
         ordering = ['title']
     title = models.CharField(max_length=MAX_LENGTH)
+    def __str__(self):
+        return self.title
 
 
 class ProductInfo(models.Model):
@@ -20,10 +22,12 @@ class ProductInfo(models.Model):
         ordering = ['sku']
     title = models.CharField(max_length=MAX_LENGTH)
     sku = models.CharField(max_length=MAX_LENGTH)
-    category = models.ForeignKey(Category)
 
 class Product(ProductInfo):
-    pass
+    category = models.ForeignKey(Category,
+        related_name='products')
+    def __str__(self):
+        return "({}) {}".format(self.sku, self.title)
 
 
 class Order(models.Model):
@@ -36,5 +40,8 @@ class OrderItem(ProductInfo):
     class Meta:
         ordering = ['sku']
     order = models.ForeignKey(Order)
+    category = models.ForeignKey(Category)
+    def __str__(self):
+        return "1 x {}".format(self.title)
 
 
