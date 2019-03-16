@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>CartBox</title>
+{% block extra_css %}{% endblock %}
+{% block extra_js %}{% endblock %}
+</head>
+<body>
+    <h1>CartBox</h1>
+    {% if user.is_authenticated %}
+        <h3>Logged in as: {{ user }}</h3>
+        <ul>
+            <li><a href="/accounts/logout/">Log out</a></li>
+        </ul>
+    {% else %}
+        <h3>Not logged in</h3>
+        <ul>
+            <li><a href="/accounts/login/">Log in</a></li>
+            <li><a href="/accounts/signup/">Sign up</a></li>
+        </ul>
+    {% endif %}
+    <hr>
+    <div id="main">
+        {% block main %}{% endblock %}
+    </div>
+    <hr>
+    {% if request.path != '/' %}
+        <p>&larr; Back to <a href="/">main page</a></p>
+    {% endif %}
+</body>
+</html>

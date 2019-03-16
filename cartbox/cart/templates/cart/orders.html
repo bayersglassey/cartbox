@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <h2>Orders</h2>
+    <ul>
+        {% for order in orders %}
+        <li><a href="/cart/orders/{{ order.id }}/">{{ order }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
