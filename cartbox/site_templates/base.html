@@ -18,6 +18,9 @@
             <li><a href="/accounts/signup/">Sign up</a></li>
         </ul>
     {% endif %}
+    {% if request.path != '/' %}
+        <p>&larr; Back to <a href="/">main page</a></p>
+    {% endif %}
     <hr>
     <div id="main">
         {% block main %}{% endblock %}

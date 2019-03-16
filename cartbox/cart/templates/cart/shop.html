@@ -2,4 +2,21 @@
 
 {% block main %}
     <h2>Shop</h2>
+    <p>Select multiple products from each category using Control+Click, Shift+Click, Control+A, etc.</p>
+    <form method="post" action="">
+        {% csrf_token %}
+        {% for category in categories %}
+            <h3>{{ category }}</h3>
+            <p>
+            <select name="category-{{ category.id }}" multiple size="6">
+                {% for product in category.products.all %}
+                <option value="{{ product.sku }}">{{ product }}</option>
+                {% endfor %}
+            </select>
+            </p>
+        {% endfor %}
+        <p>
+            <button type="submit">Place Order</button>
+        </p>
+    </form>
 {% endblock %}

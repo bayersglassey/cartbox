@@ -3,8 +3,10 @@
 {% block main %}
     <h2>Orders</h2>
     <ul>
-        {% for order in orders %}
-        <li><a href="/cart/orders/{{ order.id }}/">{{ order }}</a></li>
+        {% for order in object_list %}
+        <li><a href="/cart/order/{{ order.id }}/">{{ order }}</a></li>
+        {% empty %}
+        <li><i>No orders yet! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
         {% endfor %}
     </ul>
 {% endblock %}

@@ -21,7 +21,8 @@ class ProductInfo(models.Model):
         abstract = True
         ordering = ['sku']
     title = models.CharField(max_length=MAX_LENGTH)
-    sku = models.CharField(max_length=MAX_LENGTH)
+    sku = models.CharField(max_length=MAX_LENGTH,
+        unique=True)
 
 class Product(ProductInfo):
     category = models.ForeignKey(Category,
@@ -35,11 +36,15 @@ class Order(models.Model):
         ordering = ['id']
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
         related_name='orders')
+    def __str__(self):
+        id_msg = "(unsaved)" if self.id is None else self.id
+        return "{} {}".format(self.__class__.__name__, id_msg)
 
 class OrderItem(ProductInfo):
     class Meta:
         ordering = ['sku']
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order,
+        related_name='items')
     category = models.ForeignKey(Category)
     def __str__(self):
         return "1 x {}".format(self.title)
