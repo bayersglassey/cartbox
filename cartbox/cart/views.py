@@ -19,10 +19,7 @@ class ShopView(CreateView):
         user = request.user
         order = user.orders.create()
         for key, values in request.POST.lists():
-            CAT_PREFIX = 'category-'
-            if not key.startswith(CAT_PREFIX): continue
-            #cat_id = int(key[len(CAT_PREFIX):])
-            #cat = Category.objects.get(id=cat_id)
+            if key != 'sku': continue
             products = Product.objects.filter(sku__in=values)
             for product in products:
                 order.items.create(
