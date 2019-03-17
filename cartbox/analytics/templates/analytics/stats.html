@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load analytics_tags %}
+
 {% block main %}
     <h2>Analytics: Stats</h2>
     <p></p>
@@ -20,6 +22,15 @@
             <dd>{{ total2 }}</dd>
             <dt>Total Together</dt>
             <dd>{{ total_together }}</dd>
+            <dt>Together as Percent of Total 1</dt>
+            <dd>{{ together_over_total1|as_percent }}</dd>
+            <dt>Together as Percent of Total 2</dt>
+            <dd>{{ together_over_total2|as_percent }}</dd>
         </dl>
+        <hr>
+        <h2>Samples (for debugging the stats...)</h2>
+        {% samples "Item 1 Placed" item1_placed_samples %}
+        {% samples "Item 2 Placed" item2_placed_samples %}
+        {% samples "Items Placed Together" items_placed_together_samples %}
     {% endif %}
 {% endblock %}

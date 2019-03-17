@@ -153,5 +153,10 @@ class StatsView(SampleViewMixin, FormView):
         context['total1'] = total1
         context['total2'] = total2
         context['total_together'] = total_together
+        context['together_over_total1'] = total_together / total1
+        context['together_over_total2'] = total_together / total2
+        context['item1_placed_samples'] = item1_placed_samples
+        context['item2_placed_samples'] = item2_placed_samples
+        context['items_placed_together_samples'] = items_placed_together_samples
 
         return self.render_to_response(context)

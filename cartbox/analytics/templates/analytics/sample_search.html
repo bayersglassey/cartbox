@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load analytics_tags %}
+
 {% block main %}
     <h2>Analytics: Sample Search</h2>
     <p>
@@ -23,23 +25,7 @@
     {% if request.method == 'POST' and form.is_valid %}
         <hr>
         <h2>Results</h2>
-
-        <h3>Item Placed</h3>
-        <ul>
-            {% for sample in item_placed_samples %}
-            <li>{{ sample.fancy_str }}</li>
-            {% empty %}
-            <li><i>No samples found! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
-            {% endfor %}
-        </ul>
-
-        <h3>Items Placed Together</h3>
-        <ul>
-            {% for sample in items_placed_together_samples %}
-            <li>{{ sample.fancy_str }}</li>
-            {% empty %}
-            <li><i>No samples found! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
-            {% endfor %}
-        </ul>
+        {% samples "Item Placed" item_placed_samples %}
+        {% samples "Items Placed Together" items_placed_together_samples %}
     {% endif %}
 {% endblock %}
