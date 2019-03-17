@@ -1,0 +1,17 @@
+
+We spent some time trying to make sure sku1 < sku2 for all 2-item samples.
+But it frigs things up somewhat, e.g. trying to implement the stats page.
+What if we just generate "reversed" versions of all 2-item samples?..
+So if you add banana and apple to your cart & place an order,
+you get a sample for (banana, apple) and another for (apple, banana).
+Do we allow (banana, banana)?.. does not allowing it mess up the stats?..
+
+What is a minimal test for generating a correct statistic?
+    * start with no orders
+    * place order with banana and apple
+    * place order with just banana
+    * generates what samples?..
+    * stats should show:
+        * if you order apple, you have 100% chance of ordering banana
+        * if you order banana, you have 50% chance of ordering apple
+
