@@ -2,16 +2,23 @@
 
 {% block main %}
     <h2>Shop</h2>
-    <p>Select multiple products from each category using Control+Click, Shift+Click, Control+A, etc.</p>
+    <p>Select multiple products using Control+Click, Shift+Click, Control+A, etc.</p>
     <form method="post" action="">
         {% csrf_token %}
-        <select name="sku" multiple size="12">
+        <label for="select-sku"><h3>Products by Category</h3></label>
+        <select id="select-sku" name="sku" multiple size="12">
             {% for category in categories %}
             <optgroup label="{{ category }}">
                 {% for product in category.products.all %}
                 <option value="{{ product.sku }}">{{ product }}</option>
                 {% endfor %}
             </optgroup>
+            {% endfor %}
+        </select>
+        <label for="select-suggested-sku"><h3>Suggested Products</h3></label>
+        <select id="select-suggested-sku" name="suggested-sku" multiple size="6">
+            {% for product in user.get_suggested_products %}
+            <option value="{{ product.sku }}">{{ product }}</option>
             {% endfor %}
         </select>
         <p>

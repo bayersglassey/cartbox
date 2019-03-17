@@ -19,12 +19,14 @@ class ShopView(CreateView):
         user = request.user
         order = user.orders.create()
         for key, values in request.POST.lists():
-            if key != 'sku': continue
+            if key not in ['sku', 'suggested-sku']: continue
+            suggested = key == 'suggested-sku'
             products = Product.objects.filter(sku__in=values)
             for product in products:
                 order.items.create(
                     sku=product.sku, title=product.title,
-                    category=product.category)
+                    category=product.category,
+                    suggested=suggested)
         self.object = order
         return FormMixin.form_valid(self, form)
 

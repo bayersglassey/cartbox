@@ -27,6 +27,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'cart.cartuser'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 

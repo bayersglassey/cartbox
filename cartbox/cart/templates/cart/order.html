@@ -3,8 +3,16 @@
 {% block main %}
     <h2>{{ order }}</h2>
     <ul>
-        {% for item in order.items.all %}
-        <li>{{ item }}</li>
+        {% for category, items in order.items_by_category.items %}
+        <li>
+            <b>{{ category }}</b>
+            <ul>
+                {% for item in items %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </li>
         {% endfor %}
     </ul>
+    <p>[*] Item was added via "Suggested Products"</p>
 {% endblock %}
