@@ -20,7 +20,7 @@
             <button type="submit">Search</button>
         </p>
     </form>
-    {% if request.method == 'POST' %}
+    {% if request.method == 'POST' and form.is_valid %}
         <hr>
         <h2>Results</h2>
 

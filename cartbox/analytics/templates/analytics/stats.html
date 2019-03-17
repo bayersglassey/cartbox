@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <h2>Analytics: Stats</h2>
+    <p></p>
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>
+            <button type="submit">Search</button>
+        </p>
+    </form>
+    {% if request.method == 'POST' and form.is_valid %}
+        <hr>
+        <h2>Results</h2>
+        <dl>
+            <dt>Total 1</dt>
+            <dd>{{ total1 }}</dd>
+            <dt>Total 2</dt>
+            <dd>{{ total2 }}</dd>
+            <dt>Total Together</dt>
+            <dd>{{ total_together }}</dd>
+        </dl>
+    {% endif %}
+{% endblock %}

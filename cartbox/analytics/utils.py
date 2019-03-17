@@ -13,7 +13,10 @@ def add_item_placed_sample(user, item):
 
 
 def items_sorted(item1, item2):
-    if item1.sku < item2.sku:
+    """Make sure item1.sku < item2.sku"""
+    if item1.sku == item2.sku:
+        raise ValueError("Items with same SKU", item1, item2)
+    if item1.sku > item2.sku:
         item_temp = item2
         item2 = item1
         item1 = item_temp
