@@ -1,8 +1,11 @@
 
 from collections import defaultdict
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+
+from analytics import utils as analytics_utils
 
 
 # varchars laaame :'(
@@ -17,6 +20,7 @@ class CartUser(AbstractUser):
 class Category(models.Model):
     class Meta:
         ordering = ['title']
+        verbose_name_plural = 'categories'
     title = models.CharField(max_length=MAX_LENGTH)
     def __str__(self):
         return self.title
@@ -28,24 +32,30 @@ class ProductInfo(models.Model):
         abstract = True
         ordering = ['sku']
     title = models.CharField(max_length=MAX_LENGTH)
-    sku = models.CharField(max_length=MAX_LENGTH,
-        unique=True)
+    sku = models.CharField(max_length=MAX_LENGTH)
 
 class Product(ProductInfo):
     category = models.ForeignKey(Category,
         related_name='products')
+    sku = models.CharField(max_length=MAX_LENGTH,
+        unique=True)
     def __str__(self):
         return "({}) {}".format(self.sku, self.title)
 
 
 class Order(models.Model):
+
     class Meta:
         ordering = ['id']
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
         related_name='orders')
+    placed = models.BooleanField(default=False)
+
     def __str__(self):
         id_msg = "(unsaved)" if self.id is None else self.id
         return "{} {}".format(self.__class__.__name__, id_msg)
+
     def items_by_category(self):
         items_by_category = defaultdict(list)
         for item in self.items.all():
@@ -54,6 +64,27 @@ class Order(models.Model):
         # order.items_by_category.items in templates without Django
         # trying to add an 'items' key to our defaultdict... *sigh*
         return dict(items_by_category)
+
+    def generate_items_placed_samples(self):
+        items = list(self.items.all())
+        samples = []
+        for i, item in enumerate(items):
+            sample = analytics_utils.add_item_placed_sample(
+                self.user_id, item)
+            samples.append(sample)
+            for item2 in items[i+1:]:
+                sample = analytics_utils.add_items_placed_together_sample(
+                    self.user_id, item, item2)
+                samples.append(sample)
+        return samples
+
+    def place(self, save=True):
+        """Should be called after Order has been created, and its items
+        attached to it"""
+        self.placed = True
+        self.save()
+        self.generate_items_placed_samples()
+
 
 class OrderItem(ProductInfo):
     class Meta:

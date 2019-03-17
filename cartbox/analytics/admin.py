@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ItemPlacedSample, ItemsPlacedTogetherSample
+
+
+admin.site.register(ItemPlacedSample)
+admin.site.register(ItemsPlacedTogetherSample)

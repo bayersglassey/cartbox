@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <h2>Analytics: Sample Search</h2>
+    <p>
+        "Samples" are generated when certain events occur,
+        like a particular product being placed as an order item,
+        or a particular pair of products being placed together
+        as items in the same order.
+    </p>
+    <p>
+        This page allows you to search raw sample data,
+        but probably what you really want to see are some
+        <a href="/analytics/stats/">statistics</a>.
+    </p>
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>
+            <button type="submit">Search</button>
+        </p>
+    </form>
+    {% if request.method == 'POST' %}
+        <hr>
+        <h2>Results</h2>
+
+        <h3>Item Placed</h3>
+        <ul>
+            {% for sample in item_placed_samples %}
+            <li>{{ sample.fancy_str }}</li>
+            {% empty %}
+            <li><i>No samples found! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
+            {% endfor %}
+        </ul>
+
+        <h3>Items Placed Together</h3>
+        <ul>
+            {% for sample in items_placed_together_samples %}
+            <li>{{ sample.fancy_str }}</li>
+            {% empty %}
+            <li><i>No samples found! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

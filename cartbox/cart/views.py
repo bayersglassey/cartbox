@@ -27,6 +27,7 @@ class ShopView(CreateView):
                     sku=product.sku, title=product.title,
                     category=product.category,
                     suggested=suggested)
+        order.place()
         self.object = order
         return FormMixin.form_valid(self, form)
 
