@@ -3,12 +3,12 @@
 {% block main %}
     <h2>Welcome!</h2>
     <ul>
-        <li><a href="/cart/shop/">Go shopping</a></li>
-        <li><a href="/cart/orders/">See previous orders</a></li>
+        <li><a href="/cart/shop/">Go <b>shopping</b></a></li>
+        <li><a href="/cart/orders/">See previous <b>orders</b></a></li>
 
         {% if user.is_staff %}
-        <li><a href="/analytics/samples/search/">Search data samples</a></li>
-        <li><a href="/analytics/stats/">Get some statistics</a></li>
+        <li><a href="/analytics/samples/search/">Search data <b>samples</b></a></li>
+        <li><a href="/analytics/stats/">Get some <b>statistics</b></a></li>
         {% endif %}
     </ul>
 {% endblock %}
