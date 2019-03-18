@@ -1,11 +1,4 @@
 
-We spent some time trying to make sure sku1 < sku2 for all 2-item samples.
-But it frigs things up somewhat, e.g. trying to implement the stats page.
-What if we just generate "reversed" versions of all 2-item samples?..
-So if you add banana and apple to your cart & place an order,
-you get a sample for (banana, apple) and another for (apple, banana).
-Do we allow (banana, banana)?.. does not allowing it mess up the stats?..
-
 What is a minimal test for generating a correct statistic?
     * start with no orders
     * place order with banana and apple
@@ -14,4 +7,16 @@ What is a minimal test for generating a correct statistic?
     * stats should show:
         * if you order apple, you have 100% chance of ordering banana
         * if you order banana, you have 50% chance of ordering apple
+
+TODO:
+
+    * Instead of 'suggested' BooleanField, have a 'tags' CharField
+        which is a set of strings encoded as a comma-separated list.
+    * If we want to completely separate 'analysis' and 'cart' apps,
+        we should have analysis.models Product and Category, which
+        just store sku/id/title for display purposes.
+        I mean basically... the 'cart' app is doing that already
+        for theoretical "big e-commerce systems" which might use
+        CartBox via an API or whatever...
+
 
