@@ -22,6 +22,11 @@ TODO:
         for theoretical "big e-commerce systems" which might use
         CartBox via an API or whatever...
 
+    * Rename ItemPlacedSample, ItemsPlacedTogetherSample
+        -> SKUInOrderCounter, SKUPairInOrderCounter
+            These objects are *counting* things - they are not samples.
+            Also, these objects are counting *predicates*, not items.
+
 
 ISSUES:
 
@@ -38,8 +43,7 @@ ISSUES:
         category.
         ...but I don't yet completely understand what
         ItemsPlacedTogetherSample.cat1/cat2 are tracking...
-        -> Number of times a SKU has been placed with given category
-            in an order!.. or something.
+        -> SKUInOrderCounter, SKUPairInOrderCounter
 
     * Since there's no thing as a cart, there's no way to make
         suggestions in the way we were planning!..
