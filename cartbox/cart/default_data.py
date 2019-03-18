@@ -55,7 +55,7 @@ def updated_or_created(created, thing):
     print("{} {}: {}".format(
         msg, thing._meta.verbose_name, thing))
 
-def update_or_create_cats_and_prods():
+def update_or_create_cats_and_prods(verbose=True):
     cats = []
     prods = []
     for cat_data in CATS_AND_PRODS:
@@ -63,7 +63,7 @@ def update_or_create_cats_and_prods():
         prod_datas = cat_data['products']
         cat, created = Category.objects.update_or_create(
             title=title)
-        updated_or_created(created, cat)
+        if verbose: updated_or_created(created, cat)
         cats.append(cat)
         for prod_data in prod_datas:
             sku = prod_data['sku']
@@ -71,7 +71,7 @@ def update_or_create_cats_and_prods():
             prod, created = Product.objects.update_or_create(
                 sku=sku, defaults=dict(
                     category=cat, title=title))
-            updated_or_created(created, prod)
+            if verbose: updated_or_created(created, prod)
             prods.append(prod)
     return cats, prods
 
