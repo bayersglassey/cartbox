@@ -78,15 +78,33 @@ class Order(models.Model):
         return dict(items_by_category)
 
     def generate_items_placed_samples(self):
-        items = list(self.items.all())
+
+        # There can be multiple items generated from the same product in a
+        # single order, but the analytics samples are counting the number
+        # of *orders* in which a certain thing happened, not the number of
+        # *times* (order items).
+        # So we need to combine all items in an order which share the same
+        # SKU, for the purposes of generating a single sample.
+        skus = {item.sku for item in self.items.all()}
+        # item_tuples: list of (sku, cat, suggested)
+        item_tuples = []
+        for sku in skus:
+            cat = next(item.category_id
+                for item in self.items.all() if item.sku == sku)
+            suggested = any(item.suggested
+                for item in self.items.all() if item.sku == sku)
+            item_tuples.append((sku, cat, suggested))
+
         samples = []
-        for i, item in enumerate(items):
+        for i, (sku, cat, suggested) in enumerate(item_tuples):
             sample = analytics_utils.add_item_placed_sample(
-                self.user_id, item)
+                self.user_id, sku, cat, suggested)
             samples.append(sample)
-            for item2 in items[i+1:]:
+            for sku2, cat2, suggested2 in item_tuples[i+1:]:
                 sample = analytics_utils.add_items_placed_together_sample(
-                    self.user_id, item, item2)
+                    self.user_id,
+                    sku, sku2, cat, cat2,
+                    suggested, suggested2)
                 samples.append(sample)
         return samples
 

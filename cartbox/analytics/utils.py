@@ -2,36 +2,42 @@
 from .models import ItemPlacedSample, ItemsPlacedTogetherSample
 
 
-def add_item_placed_sample(user, item):
+def add_item_placed_sample(user, sku, cat, suggested):
     sample, created = ItemPlacedSample.objects.get_or_create(
-        user=user, sku=item.sku, cat=item.category_id,
-        suggested=item.suggested)
+        user=user, sku=sku, cat=cat, suggested=suggested)
     sample.count += 1
     sample.save()
     return sample
 
 
+def add_items_placed_together_sample(user, sku1, sku2, cat1, cat2,
+        suggested1, suggested2):
 
-def items_sorted(item1, item2):
-    """Make sure item1.sku < item2.sku"""
-    if item1.sku == item2.sku:
-        raise ValueError("Items with same SKU", item1, item2)
-    if item1.sku > item2.sku:
-        item_temp = item2
-        item2 = item1
-        item1 = item_temp
-    return item1, item2
+    if sku1 == sku2:
+        raise ValueError(
+            "Can't create ItemsPlacedTogetherSample with sku1 == sku2",
+            sku1, sku2)
 
-def add_items_placed_together_sample(user, item1, item2):
+    kwargs = {
+        'user': user,
+        'sku1': sku1, 'sku2': sku2,
+        'cat1': cat1, 'cat2': cat2,
+        'suggested1': suggested1, 'suggested2': suggested2,
+    }
+
     # The same pair of items should be added to the same sample no matter
     # which order they are given in
-    item1, item2 = items_sorted(item1, item2)
+    # (So we force them to come in order of sku1 < sku2)
+    if sku1 > sku2:
+        keys = [key for key in kwargs if key.endswith('1')]
+        for key1 in keys:
+            key2 = "{}{}".format(key1[:-1], '2')
+            temp = kwargs[key1]
+            kwargs[key1] = kwargs[key2]
+            kwargs[key2] = temp
 
     sample, created = ItemsPlacedTogetherSample.objects.get_or_create(
-        user=user,
-        sku1=item1.sku, sku2=item2.sku,
-        cat1=item1.category_id, cat2=item2.category_id,
-        suggested1=item1.suggested, suggested2=item1.suggested)
+        **kwargs)
     sample.count += 1
     sample.save()
     return sample
