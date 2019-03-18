@@ -15,6 +15,12 @@ MAX_LENGTH = 200
 class CartUser(AbstractUser):
     def get_suggested_products(self, max=5):
         return Product.objects.all()[:max]
+    def place_order(self, products):
+        order = self.orders.create()
+        for product in products:
+            item = order.add_item(product)
+        order.place()
+        return order
 
 
 class Category(models.Model):
@@ -56,6 +62,12 @@ class Order(models.Model):
         id_msg = "(unsaved)" if self.id is None else self.id
         return "{} {}".format(self.__class__.__name__, id_msg)
 
+    def add_item(self, product, **kwargs):
+        return self.items.create(
+            sku=product.sku, title=product.title,
+            category=product.category,
+            **kwargs)
+
     def items_by_category(self):
         items_by_category = defaultdict(list)
         for item in self.items.all():
@@ -78,7 +90,7 @@ class Order(models.Model):
                 samples.append(sample)
         return samples
 
-    def place(self, save=True):
+    def place(self):
         """Should be called after Order has been created, and its items
         attached to it"""
         self.placed = True

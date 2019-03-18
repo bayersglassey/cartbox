@@ -23,10 +23,7 @@ class ShopView(CreateView):
             suggested = key == 'suggested-sku'
             products = Product.objects.filter(sku__in=values)
             for product in products:
-                order.items.create(
-                    sku=product.sku, title=product.title,
-                    category=product.category,
-                    suggested=suggested)
+                item = order.add_item(product, suggested=suggested)
         order.place()
         self.object = order
         return FormMixin.form_valid(self, form)
