@@ -5,10 +5,7 @@
     <ul>
         <li><a href="/cart/shop/">Go <b>shopping</b></a></li>
         <li><a href="/cart/orders/">See previous <b>orders</b></a></li>
-
-        {% if user.is_staff %}
         <li><a href="/analytics/samples/search/">Search data <b>samples</b></a></li>
         <li><a href="/analytics/stats/">Get some <b>statistics</b></a></li>
-        {% endif %}
     </ul>
 {% endblock %}
