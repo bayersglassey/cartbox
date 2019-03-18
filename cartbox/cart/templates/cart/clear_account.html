@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block main %}
+    <h2>Clear Account</h2>
+    <p>
+        This will delete all your orders, and all analytics data associated
+        with your account.
+        <br>
+        This site is just for testing, so really the idea is to clear your
+        account, place a couple of orders with specific products, then
+        look at the <a href="/analytics/stats/">statistics</a> page and
+        verify that the algorithms are doing what you expect.
+    </p>
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Yes, Clear My Account</button>
+    </form>
+{% endblock %}

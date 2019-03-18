@@ -1,6 +1,7 @@
 
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.views.generic.edit import FormMixin
+from django import forms
 
 from .models import Category, Product, Order
 
@@ -41,3 +42,23 @@ class OrdersView(UserOrdersViewMixin, ListView):
 class OrderView(UserOrdersViewMixin, DetailView):
     template_name = 'cart/order.html'
 
+
+
+class ClearAccountView(FormView):
+    template_name = 'cart/clear_account.html'
+    form_class = forms.Form
+    success_url = '/'
+    def form_valid(self, form):
+        from analytics.models import ItemPlacedSample
+        from analytics.models import ItemsPlacedTogetherSample
+
+        request = self.request
+        user = request.user
+        print("Clearing account for user: {}".format(user))
+        print("Deleted: {}".format(user.orders.all().delete()))
+        print("Deleted: {}".format(
+            ItemPlacedSample.objects.filter(user=user.id).delete()))
+        print("Deleted: {}".format(
+            ItemsPlacedTogetherSample.objects.filter(user=user.id).delete()))
+        print("OK!")
+        return super().form_valid(form)

@@ -8,6 +8,7 @@ register = Library()
 
 @register.filter
 def as_percent(value, places='0'):
+    if value is None: return "-"
     return "{}%".format(
         Decimal(value * 100).quantize(Decimal(places)))
 
