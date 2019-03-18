@@ -25,6 +25,11 @@ TODO:
 
 ISSUES:
 
+    * Is there a Django field which will render as <select multiple>?..
+        'Cos otherwise we're gonna have to figure out how to pass POSTed
+        skus and suggested_skus to the template so it can render
+        <option selected>s all over the place. You know?
+
     * Getting statistics for categories isn't actually possible with
         current setup.
         See Order.generate_items_placed_samples.
@@ -38,5 +43,7 @@ ISSUES:
 
     * Since there's no thing as a cart, there's no way to make
         suggestions in the way we were planning!..
+        Ok, so add a button to "shop" page which says "update cart"
+        or whatever. Really it just refreshes suggested products.
 
 

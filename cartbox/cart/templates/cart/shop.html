@@ -15,14 +15,23 @@
             </optgroup>
             {% endfor %}
         </select>
+
+        {% if suggested_products %}
         <label for="select-suggested-sku"><h3>Suggested Products</h3></label>
         <select id="select-suggested-sku" name="suggested-sku" multiple size="6">
-            {% for product in user.get_suggested_products %}
+            {% for product in suggested_products %}
             <option value="{{ product.sku }}">{{ product }}</option>
             {% endfor %}
         </select>
+        {% endif %}
+
         <p>
-            <button type="submit">Place Order</button>
+            <button type="submit" name='update-cart'>Update Cart</button>
+            <button type="submit" name='place-order'>Place Order</button>
+        </p>
+        <p>
+            NOTE: Clicking "Update Cart" does nothing but generate a list of
+            "Suggested Products" from your currently selected items.
         </p>
     </form>
 {% endblock %}
