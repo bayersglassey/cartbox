@@ -1,2 +1,4 @@
-./local_settings.py
-./*.sqlite3
+/local_settings.py
+/*.sqlite3
+/.coverage
+/htmlcov/
