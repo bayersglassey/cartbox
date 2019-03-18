@@ -10,13 +10,33 @@ What is a minimal test for generating a correct statistic?
 
 TODO:
 
+    * Actually make suggestions.
+
     * Instead of 'suggested' BooleanField, have a 'tags' CharField
         which is a set of strings encoded as a comma-separated list.
+
     * If we want to completely separate 'analysis' and 'cart' apps,
         we should have analysis.models Product and Category, which
         just store sku/id/title for display purposes.
         I mean basically... the 'cart' app is doing that already
         for theoretical "big e-commerce systems" which might use
         CartBox via an API or whatever...
+
+
+ISSUES:
+
+    * Getting statistics for categories isn't actually possible with
+        current setup.
+        See Order.generate_items_placed_samples.
+        We would need a different type of sample which tracked sku
+        against category, and another type for category against
+        category.
+        ...but I don't yet completely understand what
+        ItemsPlacedTogetherSample.cat1/cat2 are tracking...
+        -> Number of times a SKU has been placed with given category
+            in an order!.. or something.
+
+    * Since there's no thing as a cart, there's no way to make
+        suggestions in the way we were planning!..
 
 
