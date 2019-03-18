@@ -4,7 +4,7 @@ from django import forms
 from cart.models import Category
 
 from .models import ItemPlacedSample, ItemsPlacedTogetherSample
-from .stats import StatsMixin
+from .stats import StatsMixin, Stats
 
 
 
@@ -61,7 +61,7 @@ class StatsForm(forms.Form):
         required=False)
 
 
-class StatsView(StatsMixin, FormView):
+class StatsView(FormView):
     form_class = StatsForm
     template_name = 'analytics/stats.html'
 
@@ -69,6 +69,7 @@ class StatsView(StatsMixin, FormView):
         request = self.request
         user = request.user
 
+        # get cleaned data
         cleaned_data = form.cleaned_data
         sku1 = cleaned_data['sku1']
         sku2 = cleaned_data['sku2']
@@ -79,37 +80,19 @@ class StatsView(StatsMixin, FormView):
         suggested1 = cleaned_data['suggested1']
         suggested2 = cleaned_data['suggested2']
 
-        # 1-item samples
-        item1_placed_samples = self.get_item_placed_samples(
-            user.id, sku1, cat1, suggested1)
-        item2_placed_samples = self.get_item_placed_samples(
-            user.id, sku2, cat2, suggested2)
-
-        # 2-item samples
-        items_placed_together_samples = (
-            self.get_items_placed_together_samples(
-                user.id, sku1, sku2, cat1, cat2,
-                suggested1, suggested2))
-
-        # stats
-        total1 = sum(sample.count for sample in item1_placed_samples)
-        total2 = sum(sample.count for sample in item2_placed_samples)
-        total_together = sum(sample.count
-            for sample in items_placed_together_samples)
-
-        def divide(x, y):
-            if y == 0: return None
-            return x / y
+        # get stats
+        stats = Stats(user.id, sku1, sku2, cat1, cat2,
+            suggested1, suggested2)
 
         # context
         context = self.get_context_data(form=form)
-        context['total1'] = total1
-        context['total2'] = total2
-        context['total_together'] = total_together
-        context['together_over_total1'] = divide(total_together, total1)
-        context['together_over_total2'] = divide(total_together, total2)
-        context['item1_placed_samples'] = item1_placed_samples
-        context['item2_placed_samples'] = item2_placed_samples
-        context['items_placed_together_samples'] = items_placed_together_samples
+        context['total1'] = stats.total1
+        context['total2'] = stats.total2
+        context['total_together'] = stats.total_together
+        context['together_over_total1'] = stats.together_over_total1
+        context['together_over_total2'] = stats.together_over_total2
+        context['item1_placed_samples'] = stats.item1_placed_samples
+        context['item2_placed_samples'] = stats.item2_placed_samples
+        context['items_placed_together_samples'] = stats.items_placed_together_samples
 
         return self.render_to_response(context)

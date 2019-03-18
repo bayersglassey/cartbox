@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 from analytics import utils as analytics_utils
+from analytics.stats import Stats
 
 
 # varchars laaame :'(
@@ -13,8 +14,13 @@ MAX_LENGTH = 200
 
 
 class CartUser(AbstractUser):
+
+    def get_all_suggested_products(self):
+        return Product.objects.all()
+
     def get_suggested_products(self, max=5):
-        return Product.objects.all()[:max]
+        return self.get_all_suggested_products()[:max]
+
     def place_order(self, products):
         order = self.orders.create()
         for product in products:

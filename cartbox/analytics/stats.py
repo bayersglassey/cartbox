@@ -2,6 +2,11 @@
 from .models import ItemPlacedSample, ItemsPlacedTogetherSample
 
 
+def divide(x, y):
+    if y == 0: return None
+    return x / y
+
+
 class StatsMixin:
 
     def get_item_placed_samples(self, user, sku, cat, suggested):
@@ -63,3 +68,30 @@ class StatsMixin:
             user, sku2, sku1, cat2, cat1, suggested2, suggested1)
         return samples
 
+
+class Stats(StatsMixin):
+
+    def __init__(self, user, sku1, sku2, cat1, cat2,
+            suggested1, suggested2):
+
+        # 1-item samples
+        self.item1_placed_samples = self.get_item_placed_samples(
+            user, sku1, cat1, suggested1)
+        self.item2_placed_samples = self.get_item_placed_samples(
+            user, sku2, cat2, suggested2)
+
+        # 2-item samples
+        self.items_placed_together_samples = (
+            self.get_items_placed_together_samples(
+                user, sku1, sku2, cat1, cat2,
+                suggested1, suggested2))
+
+        # stats
+        self.total1 = sum(sample.count
+            for sample in self.item1_placed_samples)
+        self.total2 = sum(sample.count
+            for sample in self.item2_placed_samples)
+        self.total_together = sum(sample.count
+            for sample in self.items_placed_together_samples)
+        self.together_over_total1 = divide(self.total_together, self.total1)
+        self.together_over_total2 = divide(self.total_together, self.total2)
