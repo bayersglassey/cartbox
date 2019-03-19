@@ -16,7 +16,7 @@ but the idea is to populate the database from an external source using
 (for example) a REST API.
 
 
-## The Model
+## The E-Commerce Model
 
 * *Categories* have a title and a set of *products*
 
@@ -37,7 +37,35 @@ allowing you to improve the quality of the suggestions, and verify
 that CartBox is helping users find products of interest.
 
 
-## The e-commerce interface
+## The Analytics Model
+
+The analytics engine is intended to answer questions such as
+"how many orders contain SKU 4011", and "how many orders contain
+SKUs 4011 and 210027".
+
+From those numbers, it's easy to derive statistics such as
+"probability that an order contains SKU 4011 given that it
+contains SKU 210027".
+
+Each question is a "predicate": a true/false statement about
+one of the objects in the e-commerce model (such as an order).
+For each predicate, we can store a "counter": a database object
+which counts the number of orders satisfying that predicate.
+
+For instance, there is a database object which counts "number of orders
+containing SKU 4011", and another which counts "number of orders containing
+SKUs 4011 and 210027".
+
+Counters are only created as needed, so if there are no orders
+containing a given SKU, then no counters are created for that SKU.
+
+In order to generate more kinds of statistic, we need to implement
+more kinds of counter - for instance, we could implement a counter
+for "number of order items with SKU X which were placed in an order
+containing 5 or more items".
+
+
+## The E-Commerce Interface
 
 E-commerce made simple! Pure HTML, no CSS or Javascript. Just as God intended.
 
@@ -83,7 +111,7 @@ Get statistics:
     }
 
 
-## How to deploy
+## How to Deploy
 
 It's a standard Django project.
 
