@@ -19,11 +19,18 @@ from django.views.generic import TemplateView, CreateView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 
+from cart.models import CartUser
+
+
 class Home(TemplateView):
     template_name = 'index.html'
 
+class CartUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = CartUser
+
 class RegisterView(CreateView):
-    form_class = UserCreationForm
+    form_class = CartUserCreationForm
     template_name = 'registration/signup.html'
     success_url = '/'
     def form_valid(self, form):
