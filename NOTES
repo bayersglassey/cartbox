@@ -1,9 +1,11 @@
 
+COUNTERS COUNT THE NUMBER OF ORDERS SATISFYING SOME PREDICATE.
+
+
 What is a minimal test for generating a correct statistic?
     * start with no orders
     * place order with banana and apple
     * place order with just banana
-    * generates what samples?..
     * stats should show:
         * if you order apple, you have 100% chance of ordering banana
         * if you order banana, you have 50% chance of ordering apple
@@ -12,20 +14,16 @@ TODO:
 
     * Actually make suggestions.
 
+    * Change CharFields ('sku' etc) to ForeignKeys (to Product etc).
+        The 'cart' app is part of CartBox -- just usually people won't
+        use the built-in e-commerce interface, they'll populate the data
+        from an external source.
+
     * Instead of 'suggested' BooleanField, have a 'tags' CharField
-        which is a set of strings encoded as a comma-separated list.
-
-    * If we want to completely separate 'analysis' and 'cart' apps,
-        we should have analysis.models Product and Category, which
-        just store sku/id/title for display purposes.
-        I mean basically... the 'cart' app is doing that already
-        for theoretical "big e-commerce systems" which might use
-        CartBox via an API or whatever...
-
-    * Rename ItemPlacedSample, ItemsPlacedTogetherSample
-        -> SKUInOrderCounter, SKUPairInOrderCounter
-            These objects are *counting* things - they are not samples.
-            Also, these objects are counting *predicates*, not items.
+        which is a set of strings encoded as a comma-separated list?
+        But keep in mind the predicate is applied to an entire order.
+        So 'suggested' means: *at least one of the order's items* was
+        a suggested item.
 
 
 ISSUES:
@@ -37,13 +35,10 @@ ISSUES:
 
     * Getting statistics for categories isn't actually possible with
         current setup.
-        See Order.generate_items_placed_samples.
-        We would need a different type of sample which tracked sku
+        See Order.process_analytics.
+        We would need a different type of counter which tracked sku
         against category, and another type for category against
         category.
-        ...but I don't yet completely understand what
-        ItemsPlacedTogetherSample.cat1/cat2 are tracking...
-        -> SKUInOrderCounter, SKUPairInOrderCounter
 
     * Since there's no thing as a cart, there's no way to make
         suggestions in the way we were planning!..
