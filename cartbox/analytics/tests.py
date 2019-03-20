@@ -89,5 +89,8 @@ class AnalyticsViewsTestCase(CartTestCaseMixin, TestCase):
         response = self.counter_view(request)
         self.assertEqual(response.status_code, 200)
         context = response.context_data
-        print("\nCONTEXT: {}\n".format(context))
+        counters = context['sku_in_order_counters']
+        self.assertLen(counters, 1)
+        counter = counters[0]
+        self.assertEqual(counter.count, 2)
 

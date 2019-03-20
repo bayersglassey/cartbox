@@ -34,6 +34,11 @@ class CartTestCaseMixin:
         self.beef = Product.objects.get(sku='210001')
         self.veal = Product.objects.get(sku='210007')
 
+    def assertLen(self, xs, n):
+        if len(xs) != n:
+            raise AssertionError("len of {} != {}"
+                .format(repr(xs), repr(n)))
+
     def assertStartsWith(self, x, y):
         if not x.startswith(y):
             raise AssertionError("{} does not start with {}"
