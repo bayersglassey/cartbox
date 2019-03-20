@@ -158,9 +158,7 @@ From repo's root directory, in a fresh virtualenv,
 
 ...should do the trick. Default categories & products are included:
 
-    ./manage.py shell
-    >>> from cart.default_data import update_or_create_cats_and_prods
-    >>> update_or_create_cats_and_prods()
+    ./manage.py update_or_create_cats_and_prods
 
 Now open localhost:8000 in your browser and buy buy buy!..
 
