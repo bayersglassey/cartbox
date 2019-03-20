@@ -1,2 +1,2 @@
 psycopg2==2.7.4
-Django==1.10.8
+Django~=1.11
