@@ -85,16 +85,16 @@ class ClearAccountView(FormView):
     form_class = forms.Form
     success_url = '/'
     def form_valid(self, form):
-        from analytics.models import ItemPlacedSample
-        from analytics.models import ItemsPlacedTogetherSample
+        from analytics.models import SKUInOrderCounter
+        from analytics.models import SKUPairInOrderCounter
 
         request = self.request
         user = request.user
         print("Clearing account for user: {}".format(user))
         print("Deleted: {}".format(user.orders.all().delete()))
         print("Deleted: {}".format(
-            ItemPlacedSample.objects.filter(user=user.id).delete()))
+            SKUInOrderCounter.objects.filter(user=user.id).delete()))
         print("Deleted: {}".format(
-            ItemsPlacedTogetherSample.objects.filter(user=user.id).delete()))
+            SKUPairInOrderCounter.objects.filter(user=user.id).delete()))
         print("OK!")
         return super().form_valid(form)

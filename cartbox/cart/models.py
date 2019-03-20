@@ -15,12 +15,6 @@ MAX_LENGTH = 200
 
 class CartUser(AbstractUser):
 
-    def get_all_suggested_products(self):
-        return Product.objects.all()
-
-    def get_suggested_products(self, max=5):
-        return self.get_all_suggested_products()[:max]
-
     def place_order(self, products):
         order = self.orders.create()
         for product in products:
@@ -83,15 +77,11 @@ class Order(models.Model):
         # trying to add an 'items' key to our defaultdict... *sigh*
         return dict(items_by_category)
 
-    def generate_items_placed_samples(self):
+    def process_analytics(self):
 
-        # There can be multiple items generated from the same product in a
-        # single order, but the analytics samples are counting the number
-        # of *orders* in which a certain thing happened, not the number of
-        # *times* (order items).
-        # So we need to combine all items in an order which share the same
-        # SKU, for the purposes of generating a single sample.
+        # Find all skus in order
         skus = {item.sku for item in self.items.all()}
+
         # item_tuples: list of (sku, cat, suggested)
         item_tuples = []
         for sku in skus:
@@ -101,25 +91,26 @@ class Order(models.Model):
                 for item in self.items.all() if item.sku == sku)
             item_tuples.append((sku, cat, suggested))
 
-        samples = []
+        counters = []
         for i, (sku, cat, suggested) in enumerate(item_tuples):
-            sample = analytics_utils.add_item_placed_sample(
+            counter = analytics_utils.add_sku_in_order(
                 self.user_id, sku, cat, suggested)
-            samples.append(sample)
+            counters.append(counter)
             for sku2, cat2, suggested2 in item_tuples[i+1:]:
-                sample = analytics_utils.add_items_placed_together_sample(
+                counter = analytics_utils.add_sku_pair_in_order(
                     self.user_id,
                     sku, sku2, cat, cat2,
                     suggested, suggested2)
-                samples.append(sample)
-        return samples
+                counters.append(counter)
+
+        return counters
 
     def place(self):
         """Should be called after Order has been created, and its items
         attached to it"""
         self.placed = True
         self.save()
-        self.generate_items_placed_samples()
+        self.process_analytics()
 
 
 class OrderItem(ProductInfo):

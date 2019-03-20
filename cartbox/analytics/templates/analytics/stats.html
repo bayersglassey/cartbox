@@ -16,21 +16,21 @@
         <hr>
         <h2>Results</h2>
         <dl>
-            <dt>Total 1</dt>
+            <dt>Orders with SKU 1</dt>
             <dd>{{ total1 }}</dd>
-            <dt>Total 2</dt>
+            <dt>Orders with SKU 2</dt>
             <dd>{{ total2 }}</dd>
-            <dt>Total Together</dt>
-            <dd>{{ total_together }}</dd>
-            <dt>Together as Percent of Total 1 (Probability of ordering SKU 1 having already ordered SKU 2)</dt>
-            <dd>{{ together_over_total1|as_percent }}</dd>
-            <dt>Together as Percent of Total 2 (Probability of ordering SKU 2 having already ordered SKU 1)</dt>
-            <dd>{{ together_over_total2|as_percent }}</dd>
+            <dt>Orders with both SKUs</dt>
+            <dd>{{ total_both }}</dd>
+            <dt>Probability of order containing SKU 2 given SKU 1</dt>
+            <dd>{{ both_over_total1|as_percent }}</dd>
+            <dt>Probability of order containing SKU 1 given SKU 2</dt>
+            <dd>{{ both_over_total2|as_percent }}</dd>
         </dl>
         <hr>
-        <h2>Samples (for debugging the stats...)</h2>
-        {% samples "Item 1 Placed" item1_placed_samples %}
-        {% samples "Item 2 Placed" item2_placed_samples %}
-        {% samples "Items Placed Together" items_placed_together_samples %}
+        <h2>Counters Used (for debugging the stats...)</h2>
+        {% counters "Orders with SKU 1" sku1_in_order_counters %}
+        {% counters "Orders with SKU 2" sku2_in_order_counters %}
+        {% counters "Orders with both SKUs" sku_pair_in_order_counters %}
     {% endif %}
 {% endblock %}

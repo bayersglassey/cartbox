@@ -1,0 +1,9 @@
+
+<h3>{{ title }}</h3>
+<ul>
+    {% for counter in counters %}
+    <li>{{ counter.fancy_str }}</li>
+    {% empty %}
+    <li><i>No counters found! Maybe it's time to <a href="/cart/shop/">go shopping</a>...</i></li>
+    {% endfor %}
+</ul>

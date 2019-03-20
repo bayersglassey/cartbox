@@ -1,21 +1,21 @@
 
-from .models import ItemPlacedSample, ItemsPlacedTogetherSample
+from .models import SKUInOrderCounter, SKUPairInOrderCounter
 
 
-def add_item_placed_sample(user, sku, cat, suggested):
-    sample, created = ItemPlacedSample.objects.get_or_create(
+def add_sku_in_order(user, sku, cat, suggested):
+    counter, created = SKUInOrderCounter.objects.get_or_create(
         user=user, sku=sku, cat=cat, suggested=suggested)
-    sample.count += 1
-    sample.save()
-    return sample
+    counter.count += 1
+    counter.save()
+    return counter
 
 
-def add_items_placed_together_sample(user, sku1, sku2, cat1, cat2,
+def add_sku_pair_in_order(user, sku1, sku2, cat1, cat2,
         suggested1, suggested2):
 
     if sku1 == sku2:
         raise ValueError(
-            "Can't create ItemsPlacedTogetherSample with sku1 == sku2",
+            "Can't create SKUPairInOrderCounter with sku1 == sku2",
             sku1, sku2)
 
     kwargs = {
@@ -25,9 +25,8 @@ def add_items_placed_together_sample(user, sku1, sku2, cat1, cat2,
         'suggested1': suggested1, 'suggested2': suggested2,
     }
 
-    # The same pair of items should be added to the same sample no matter
-    # which order they are given in
-    # (So we force them to come in order of sku1 < sku2)
+    # The pair of SKUs should be unordered, so we normalize it
+    # such that sku1 < sku2
     if sku1 > sku2:
         keys = [key for key in kwargs if key.endswith('1')]
         for key1 in keys:
@@ -36,9 +35,9 @@ def add_items_placed_together_sample(user, sku1, sku2, cat1, cat2,
             kwargs[key1] = kwargs[key2]
             kwargs[key2] = temp
 
-    sample, created = ItemsPlacedTogetherSample.objects.get_or_create(
+    counter, created = SKUPairInOrderCounter.objects.get_or_create(
         **kwargs)
-    sample.count += 1
-    sample.save()
-    return sample
+    counter.count += 1
+    counter.save()
+    return counter
 

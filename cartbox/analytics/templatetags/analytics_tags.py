@@ -12,9 +12,9 @@ def as_percent(value, places='0'):
     return "{}%".format(
         Decimal(value * 100).quantize(Decimal(places)))
 
-@register.inclusion_tag('analytics/includes/samples.html')
-def samples(title, samples):
+@register.inclusion_tag('analytics/includes/counters.html')
+def counters(title, counters):
     return {
         'title': title,
-        'samples': samples,
+        'counters': counters,
     }

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import ItemPlacedSample, ItemsPlacedTogetherSample
+from .models import SKUInOrderCounter, SKUPairInOrderCounter
 
 
-admin.site.register(ItemPlacedSample)
-admin.site.register(ItemsPlacedTogetherSample)
+admin.site.register(SKUInOrderCounter)
+admin.site.register(SKUPairInOrderCounter)

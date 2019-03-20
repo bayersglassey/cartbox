@@ -3,7 +3,7 @@ from django.db import models
 MAX_LENGTH = 200
 
 
-class Sample(models.Model):
+class Counter(models.Model):
     class Meta:
         abstract = True
     count = models.IntegerField(default=0)
@@ -17,8 +17,6 @@ def get_pseudo_item_msg(user, sku, cat, suggested):
     return "{} {}{}".format(sku, cat, suggested_msg)
 
 def get_item_msg(user, sku, cat, suggested, product=None, category=None):
-    # TODO: Should we use this?.. it hits the database, and in particular
-    # it assumes that we're using the 'cart' app and its models.
     from cart.models import Product, Category
     if product is None:
         product = Product.objects.filter(sku=sku).first()
@@ -30,7 +28,7 @@ def get_item_msg(user, sku, cat, suggested, product=None, category=None):
     return "({}) {} ({}){}".format(sku, title, cat_title, suggested_msg)
 
 
-class ItemPlacedSample(Sample):
+class SKUInOrderCounter(Counter):
     user = models.CharField(max_length=MAX_LENGTH)
     sku = models.CharField(max_length=MAX_LENGTH)
     cat = models.CharField(max_length=MAX_LENGTH)
@@ -50,14 +48,12 @@ class ItemPlacedSample(Sample):
         return "{} x {}".format(self.count, item_msg)
 
 
-class ItemsPlacedTogetherSample(Sample):
+class SKUPairInOrderCounter(Counter):
     user = models.CharField(max_length=MAX_LENGTH)
 
     # NOTE: it should always be the case that sku1 < sku2.
-    # That's so that the samples of a given pair of products are aggregated
-    # without regard to the order in which the products are given.
-    # If you know what I mean.
-    # In particular, sku == sku makes no sense and indicates somebody having
+    # That's because we're counting unordered pairs of SKUs.
+    # Also, sku == sku makes no sense and indicates somebody having
     # made an error somewhere.
     sku1 = models.CharField(max_length=MAX_LENGTH)
     sku2 = models.CharField(max_length=MAX_LENGTH)

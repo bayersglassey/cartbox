@@ -3,15 +3,13 @@
 {% load analytics_tags %}
 
 {% block main %}
-    <h2>Analytics: Sample Search</h2>
+    <h2>Analytics: Counter Search</h2>
     <p>
-        "Samples" are generated when certain events occur,
-        like a particular product being placed as an order item,
-        or a particular pair of products being placed together
-        as items in the same order.
+        "Counters" track the number of times certain events occur,
+        like a particular SKU (or pair of SKUs) showing up in an order.
     </p>
     <p>
-        This page allows you to search raw sample data,
+        This page allows you to search raw analytics data,
         but probably what you really want to see are some
         <a href="/analytics/stats/">statistics</a>.
     </p>
@@ -25,7 +23,7 @@
     {% if request.method == 'POST' and form.is_valid %}
         <hr>
         <h2>Results</h2>
-        {% samples "Item Placed" item_placed_samples %}
-        {% samples "Items Placed Together" items_placed_together_samples %}
+        {% counters "SKU in Order" sku_in_order_counters %}
+        {% counters "SKU Pair in Order" sku_pair_in_order_counters %}
     {% endif %}
 {% endblock %}

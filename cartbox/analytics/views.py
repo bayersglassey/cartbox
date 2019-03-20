@@ -3,21 +3,21 @@ from django import forms
 
 from cart.models import Category
 
-from .models import ItemPlacedSample, ItemsPlacedTogetherSample
+from .models import SKUInOrderCounter, SKUPairInOrderCounter
 from .stats import StatsMixin, Stats
 
 
 
-class SampleSearchForm(forms.Form):
+class CounterForm(forms.Form):
     sku = forms.CharField(label="SKU", required=False)
     cat = forms.ModelChoiceField(label="Category", required=False,
         queryset=Category.objects.all())
     suggested = forms.BooleanField(label="Product was suggested",
         required=False)
 
-class SampleSearchView(StatsMixin, FormView):
-    form_class = SampleSearchForm
-    template_name = 'analytics/sample_search.html'
+class CounterView(StatsMixin, FormView):
+    form_class = CounterForm
+    template_name = 'analytics/counters.html'
 
     def form_valid(self, form):
         request = self.request
@@ -29,20 +29,20 @@ class SampleSearchView(StatsMixin, FormView):
         cat = category and category.id
         suggested = cleaned_data['suggested']
 
-        # 1-item samples
-        item_placed_samples = self.get_item_placed_samples(
+        # 1-SKU counters
+        sku_in_order_counters = self.get_sku_in_order_counters(
             user.id, sku, cat, suggested)
 
-        # 2-item samples
-        items_placed_together_samples = (
-            self.get_items_placed_together_samples_item1_or_item2(
+        # 2-SKU counters
+        sku_pair_in_order_counters = (
+            self.get_sku_pair_in_order_counters_for_sku(
                 user.id, sku, cat, suggested))
 
         # context
         context = self.get_context_data(form=form)
-        context['item_placed_samples'] = item_placed_samples
-        context['items_placed_together_samples'] = (
-            items_placed_together_samples)
+        context['sku_in_order_counters'] = sku_in_order_counters
+        context['sku_pair_in_order_counters'] = (
+            sku_pair_in_order_counters)
 
         return self.render_to_response(context)
 
@@ -88,11 +88,11 @@ class StatsView(FormView):
         context = self.get_context_data(form=form)
         context['total1'] = stats.total1
         context['total2'] = stats.total2
-        context['total_together'] = stats.total_together
-        context['together_over_total1'] = stats.together_over_total1
-        context['together_over_total2'] = stats.together_over_total2
-        context['item1_placed_samples'] = stats.item1_placed_samples
-        context['item2_placed_samples'] = stats.item2_placed_samples
-        context['items_placed_together_samples'] = stats.items_placed_together_samples
+        context['total_both'] = stats.total_both
+        context['both_over_total1'] = stats.both_over_total1
+        context['both_over_total2'] = stats.both_over_total2
+        context['sku1_in_order_counters'] = stats.sku1_in_order_counters
+        context['sku2_in_order_counters'] = stats.sku2_in_order_counters
+        context['sku_pair_in_order_counters'] = stats.sku_pair_in_order_counters
 
         return self.render_to_response(context)
