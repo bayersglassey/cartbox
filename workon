@@ -1,0 +1,2 @@
+export PATH="/home/cartbox/envs/cartbox/bin:$PATH"
+cd repos/cartbox/cartbox

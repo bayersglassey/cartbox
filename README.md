@@ -62,7 +62,8 @@ containing a given SKU, then no counters are created for it.
 In order to generate more kinds of statistic, we just need to implement
 more kinds of counter - for instance, we could implement a counter
 for "number of order items with SKU X which were placed in an order
-containing 5 or more items".
+containing 5 or more items", or "number of orders containing SKU X
+and category Y".
 
 
 ## The E-Commerce Interface
