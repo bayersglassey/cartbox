@@ -28,9 +28,10 @@
             <dd>{{ both_over_total2|as_percent }}</dd>
         </dl>
         <hr>
-        <h2>Counters Used (for debugging the stats...)</h2>
-        {% counters "Orders with SKU 1" sku1_in_order_counters %}
-        {% counters "Orders with SKU 2" sku2_in_order_counters %}
-        {% counters "Orders with both SKUs" sku_pair_in_order_counters %}
+        <h2>Counters Used</h2>
+        <p>(may be useful for debugging the stats)</p>
+        {% counters "SKU 1 in Order" sku1_in_order_counters %}
+        {% counters "SKU 2 in Order" sku2_in_order_counters %}
+        {% counters "Both SKUs in Order" sku_pair_in_order_counters %}
     {% endif %}
 {% endblock %}

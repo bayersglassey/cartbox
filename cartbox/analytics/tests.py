@@ -8,22 +8,52 @@ from .stats import Stats
 
 class AnalyticsTestCase(CartTestCaseMixin, TestCase):
 
+    def test_swap_keys_1_2(self):
+        d = {'a1': 10, 'a2': 20, 'x1': 30}
+        utils.swap_keys_1_2(d)
+        self.assertEqual(d, {'a2': 10, 'a1': 20, 'x1': 30})
+
+    def test_normalize_sku_pair_keys_no_swap(self):
+        # If sku1 is already < sku2, we don't swap the keys
+        d = {
+            'user': 'q',
+            'sku1': 'AAA', 'cat1': 'Fruit',
+            'sku2': 'BBB', 'cat2': 'Veg',
+        }
+        normalize_sku_pair_keys(d)
+        self.assertEqual(d, {
+            'user': 'q',
+            'sku1': 'AAA', 'cat1': 'Fruit',
+            'sku2': 'BBB', 'cat2': 'Veg',
+        })
+
+    def normalize_sku_pair_keys_swap(self):
+        # If sku1 is > sku2, we swap the keys
+        d = {
+            'user': 'q',
+            'sku1': 'BBB', 'cat1': 'Fruit',
+            'sku2': 'AAA', 'cat2': 'Veg',
+        }
+        normalize_sku_pair_keys(d)
+        self.assertEqual(d, {
+            'user': 'q',
+            'sku2': 'BBB', 'cat2': 'Fruit',
+            'sku1': 'AAA', 'cat1': 'Veg',
+        })
+
+
     def test_basic_stats(self):
         order1 = self.user.place_order([self.banana, self.apple])
         order2 = self.user.place_order([self.banana])
 
         stats = Stats(self.user.id,
-            self.banana.sku, self.apple.sku,
-            self.fruit.id, self.fruit.id,
-            False, False)
+            self.banana.sku, self.apple.sku)
         self.assertEqual(stats.total1, 2)
         self.assertEqual(stats.total2, 1)
         self.assertEqual(stats.total_both, 1)
 
         stats = Stats(self.user.id,
-            self.apple.sku, self.banana.sku,
-            self.fruit.id, self.fruit.id,
-            False, False)
+            self.apple.sku, self.banana.sku)
         self.assertEqual(stats.total1, 1)
         self.assertEqual(stats.total2, 2)
         self.assertEqual(stats.total_both, 1)
@@ -36,7 +66,17 @@ class AnalyticsTestCase(CartTestCaseMixin, TestCase):
         counter = stats.sku_pair_in_order_counters[0]
         str(counter)
 
-    def test_cant_count_sku_with_itself(self):
+    def test_add_sku_pair_in_order(self):
+        utils.add_sku_pair_in_order(self.user.id,
+            self.banana.sku, self.apple.sku,
+            self.fruit.id, self.fruit.id,
+            False, False)
+        utils.add_sku_pair_in_order(self.user.id,
+            self.apple.sku, self.banana.sku,
+            self.fruit.id, self.fruit.id,
+            False, False)
+
+    def test_cant_pair_sku_with_itself(self):
         with self.assertRaises(ValueError):
             utils.add_sku_pair_in_order(self.user.id,
                 self.banana.sku, self.banana.sku,

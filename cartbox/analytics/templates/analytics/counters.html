@@ -9,7 +9,7 @@
         like a particular SKU (or pair of SKUs) showing up in an order.
     </p>
     <p>
-        This page allows you to search raw analytics data,
+        This page allows you to search the database for counter objects,
         but probably what you really want to see are some
         <a href="/analytics/stats/">statistics</a>.
     </p>
@@ -24,6 +24,6 @@
         <hr>
         <h2>Results</h2>
         {% counters "SKU in Order" sku_in_order_counters %}
-        {% counters "SKU Pair in Order" sku_pair_in_order_counters %}
+        {% counters "SKU is part of SKU Pair in Order" sku_pair_in_order_counters %}
     {% endif %}
 {% endblock %}

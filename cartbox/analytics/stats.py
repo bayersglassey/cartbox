@@ -9,34 +9,38 @@ def divide(x, y):
 
 class StatsMixin:
 
-    def get_sku_in_order_counters(self, user, sku, cat, suggested):
+    def get_sku_in_order_counters(
+            self, user=None, sku=None, cat=None, suggested=None):
         """Returns counters for given SKU"""
-        filter = {'user': user}
+        filter = {}
+        if user: filter['user'] = user
         if sku: filter['sku'] = sku
         if cat: filter['cat'] = cat
         if suggested: filter['suggested'] = suggested
         return SKUInOrderCounter.objects.filter(**filter)
 
     def get_sku_pair_in_order_counters_for_sku1(
-            self, user, sku, cat, suggested):
+            self, user=None, sku=None, cat=None, suggested=None):
         """Returns counters where given SKU appears as sku1"""
-        filter = {'user': user}
+        filter = {}
+        if user: filter['user'] = user
         if sku: filter['sku1'] = sku
         if cat: filter['cat1'] = cat
         if suggested: filter['suggested1'] = suggested
         return SKUPairInOrderCounter.objects.filter(**filter)
 
     def get_sku_pair_in_order_counters_for_sku2(
-            self, user, sku, cat, suggested):
+            self, user=None, sku=None, cat=None, suggested=None):
         """Returns counters where given SKU appears as sku2"""
-        filter = {'user': user}
+        filter = {}
+        if user: filter['user'] = user
         if sku: filter['sku2'] = sku
         if cat: filter['cat2'] = cat
         if suggested: filter['suggested2'] = suggested
         return SKUPairInOrderCounter.objects.filter(**filter)
 
     def get_sku_pair_in_order_counters_for_sku(
-            self, user, sku, cat, suggested):
+            self, user=None, sku=None, cat=None, suggested=None):
         """Returns counters where given SKU appears as sku1 or sku2"""
         counters = self.get_sku_pair_in_order_counters_for_sku1(
             user, sku, cat, suggested)
@@ -45,11 +49,14 @@ class StatsMixin:
         return counters
 
     def get_sku_pair_in_order_counters_ordered(
-            self, user, sku1, sku2, cat1, cat2,
-            suggested1, suggested2):
+            self, user=None,
+            sku1=None, sku2=None,
+            cat1=None, cat2=None,
+            suggested1=None, suggested2=None):
         """Returns counters where given SKUs appear (as an
         ordered pair)"""
-        filter = {'user': user}
+        filter = {}
+        if user: filter['user'] = user
         if sku1: filter['sku1'] = sku1
         if sku2: filter['sku2'] = sku2
         if cat1: filter['cat1'] = cat1
@@ -59,10 +66,18 @@ class StatsMixin:
         return SKUPairInOrderCounter.objects.filter(**filter)
 
     def get_sku_pair_in_order_counters(
-            self, user, sku1, sku2, cat1, cat2,
-            suggested1, suggested2):
+            self, user=None,
+            sku1=None, sku2=None,
+            cat1=None, cat2=None,
+            suggested1=None, suggested2=None):
         """Returns counters where given SKUs appear (as an
-        unordered pair"""
+        unordered pair).
+        NOTE: It's important to think of counters as representing
+        *sets* of orders.
+        We use the '|' operator with QuerySets so that the database will
+        take their union, but equivalently you could combine the two sets
+        of results in Python by calling set(...) on the querysets, then
+        using '|' on the resulting sets."""
         counters = self.get_sku_pair_in_order_counters_ordered(
             user, sku1, sku2, cat1, cat2, suggested1, suggested2)
         counters |= self.get_sku_pair_in_order_counters_ordered(
@@ -72,8 +87,9 @@ class StatsMixin:
 
 class Stats(StatsMixin):
 
-    def __init__(self, user, sku1, sku2, cat1, cat2,
-            suggested1, suggested2):
+    def __init__(self, user=None,
+            sku1=None, sku2=None, cat1=None, cat2=None,
+            suggested1=None, suggested2=None):
 
         # 1-SKU counters
         self.sku1_in_order_counters = self.get_sku_in_order_counters(
