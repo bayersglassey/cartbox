@@ -45,4 +45,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/signup/$', RegisterView.as_view()),
     url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^api/', include('apibox.urls')),
 ]
