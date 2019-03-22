@@ -4,4 +4,49 @@ body {
     margin: auto;
     margin-top: 2em;
     margin-bottom: 2em;
+    background-color: #fff;
+    font-family: sans-serif;
+    letter-spacing: .025em;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    font-variant: small-caps;
+}
+
+h1 {
+    background-color: #fca;
+    padding: .2em;
+    padding-bottom: 1em;
+}
+
+h2 {
+    background-color: #bef;
+    padding: .2em;
+}
+
+h3 {
+    background-color: #dfd;
+    padding: .2em;
+}
+
+h1, h2 {
+    letter-spacing: .1em;
+}
+
+h3 {
+    letter-spacing: .05em;
+}
+
+li {
+    line-height: 1.5em;
+}
+
+li {
+    list-style-type: square;
+}
+
+input, select, button {
+    padding: .25em;
+    border-radius: .5em;
 }

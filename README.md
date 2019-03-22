@@ -128,8 +128,7 @@ product" lists.
 
 ## The E-Commerce Web App
 
-E-commerce made simple! Pure HTML, no CSS or Javascript -
-just as God intended.
+E-commerce made simple! Pure HTML, no Javascript - just as God intended.
 
 (Just kidding. Use the API for goodness' sake.)
 
