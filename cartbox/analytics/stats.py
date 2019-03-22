@@ -1,5 +1,8 @@
 
+from collections import defaultdict
+
 from .models import SKUInOrderCounter, SKUPairInOrderCounter
+from .utils import swap_keys
 
 
 def divide(x, y):
@@ -69,27 +72,50 @@ class StatsMixin:
             self, user=None,
             sku1=None, sku2=None,
             cat1=None, cat2=None,
-            suggested1=None, suggested2=None):
+            suggested1=None, suggested2=None,
+            tag_as_swapped=False):
         """Returns counters where given SKUs appear (as an
-        unordered pair).
-        NOTE: It's important to think of counters as representing
-        *sets* of orders.
-        We use the '|' operator with QuerySets so that the database will
-        take their union, but equivalently you could combine the two sets
-        of results in Python by calling set(...) on the querysets, then
-        using '|' on the resulting sets."""
+        unordered pair)."""
         counters = self.get_sku_pair_in_order_counters_ordered(
             user, sku1, sku2, cat1, cat2, suggested1, suggested2)
-        counters |= self.get_sku_pair_in_order_counters_ordered(
+        counters_swapped = self.get_sku_pair_in_order_counters_ordered(
             user, sku2, sku1, cat2, cat1, suggested2, suggested1)
-        return counters
+
+        if tag_as_swapped:
+            # Could we convince the database to 'tag' the second query's
+            # entries for us?.. so we could then order the resulting
+            # queryset and take first 10 counters or whatever, instead
+            # of having to download them all and do the tagging in Python.
+            for counter in counters:
+                counter.swapped = False
+            for counter in counters_swapped:
+                counter.swapped = True
+            combined_counters = set(counters) | set(counters_swapped)
+            return sorted(combined_counters, reverse=True,
+                key=lambda counter: counter.count)
+        else:
+            return (counters | counters_swapped).order_by('-count')
 
 
 class Stats(StatsMixin):
 
     def __init__(self, user=None,
             sku1=None, sku2=None, cat1=None, cat2=None,
-            suggested1=None, suggested2=None):
+            suggested1=None, suggested2=None,
+            suggestion_keys=None, limit=None):
+
+        # suggestion_keys: attributes of SKUPairInOrderCounter
+        # In other words, *what it is we're suggesting*.
+        # Are we suggesting the best sku?.. or best (sku, cat)?..
+        # Or best (sku, cat, suggested) -- e.g. we may predict that
+        # user is more likely to add a given (sku, cat) *from the
+        # Suggested Products widget*.
+        if suggestion_keys is None:
+            suggestion_keys = ['sku2']
+        suggestion_keys = [key for key in suggestion_keys
+            if key in ['sku2', 'cat2', 'suggested2']]
+        suggestion_keys_swapped = swap_keys(suggestion_keys)
+
 
         # 1-SKU counters
         self.sku1_in_order_counters = self.get_sku_in_order_counters(
@@ -101,7 +127,8 @@ class Stats(StatsMixin):
         self.sku_pair_in_order_counters = (
             self.get_sku_pair_in_order_counters(
                 user, sku1, sku2, cat1, cat2,
-                suggested1, suggested2))
+                suggested1, suggested2,
+                tag_as_swapped=True))
 
         # stats
         self.total1 = sum(counter.count
@@ -112,3 +139,21 @@ class Stats(StatsMixin):
             for counter in self.sku_pair_in_order_counters)
         self.both_over_total1 = divide(self.total_both, self.total1)
         self.both_over_total2 = divide(self.total_both, self.total2)
+
+        # self.suggestions: list of (suggestion, total2)
+        # where a suggestion is a tuple of attributes of
+        # SKUPairInOrderCounter
+        suggestion_map = defaultdict(int)
+        for counter in self.sku_pair_in_order_counters:
+            # TODO: Document the meaning of this tag_as_swapped stuff.
+            attrs = (suggestion_keys_swapped
+                if counter.swapped else suggestion_keys)
+            suggestion = tuple(
+                getattr(counter, attr) for attr in attrs)
+            suggestion_map[suggestion] += counter.count
+
+        self.suggestions = sorted(suggestion_map.items(), reverse=True,
+            key=lambda suggestion_and_total2: suggestion_and_total2[1])
+
+        if limit is not None:
+            self.suggestions = self.suggestions[:limit]

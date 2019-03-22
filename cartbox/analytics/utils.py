@@ -2,10 +2,21 @@
 from .models import SKUInOrderCounter, SKUPairInOrderCounter
 
 
-def swap_keys_1_2(d):
+def swap_keys(keys):
+    """Modifies the given list of strings, changing last character from
+    '1' to '2' and vice versa (if applicable).
+    E.g. 'sku1' is changed to 'sku2' and vice versa."""
+    def swap_key(key):
+        c = key[-1:]
+        if c == '1': key = "{}{}".format(key[:-1], '2')
+        elif c == '2': key = "{}{}".format(key[:-1], '1')
+        return key
+    return [swap_key(key) for key in keys]
+
+def swap_dict_keys(d):
     """Modifies the given dict, swapping the values of every pair of keys
     which are the same, except that one ends in '1' and the other in '2'.
-    E.g. if there are keys 'abc1' and 'abc2', then their values are swapped.
+    E.g. if there are keys 'sku1' and 'sku2', then their values are swapped.
     """
     for key1 in d:
         if not key1.endswith('1'): continue
@@ -25,7 +36,7 @@ def normalize_sku_pair_keys(d):
     if sku1 is None: return
     if sku2 is None: return
     if sku1 > sku2:
-        swap_keys_1_2(d)
+        swap_dict_keys(d)
 
 
 def add_sku_in_order(user, sku, cat, suggested):

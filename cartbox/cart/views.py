@@ -5,10 +5,10 @@ from django import forms
 
 from .models import Category, Product, Order
 
-from analytics.stats import StatsMixin
+from analytics.stats import Stats
 
 
-class ShopView(StatsMixin, CreateView):
+class ShopView(CreateView):
     model = Order
     fields = []
     template_name = 'cart/shop.html'
@@ -20,10 +20,18 @@ class ShopView(StatsMixin, CreateView):
         context['suggested_products'] = self.get_suggested_products()
         return context
 
-    def get_suggested_product(self, user, product):
-        # TODO: Use StatsMixin to figure out which product which isn't
-        # already in the cart has the highest chance of user clicking it.
-        return product
+    def get_suggested_product(self, user, cart_products, product):
+        # TODO: Make this less crappy.
+        # Although really, this method shouldn't exist at all...
+        # get_suggested_products should combine the suggestions for
+        # all cart products somehow, and take the first N of those,
+        # or whatever.
+        stats = Stats(user.id, sku1=product.sku)
+        suggested_skus = [sku for ((sku,), count) in stats.suggestions]
+        if suggested_skus:
+            sku = suggested_skus[0]
+            return Product.objects.get(sku=sku)
+        return None
 
     def get_suggested_products(self):
         request = self.request
@@ -32,7 +40,8 @@ class ShopView(StatsMixin, CreateView):
         suggested_products = []
         for product in cart_products:
             suggested_product = self.get_suggested_product(
-                user, product)
+                user, cart_products, product)
+            if suggested_product is None: continue
             suggested_products.append(suggested_product)
         return suggested_products
 

@@ -94,5 +94,6 @@ class StatsView(FormView):
         context['sku1_in_order_counters'] = stats.sku1_in_order_counters
         context['sku2_in_order_counters'] = stats.sku2_in_order_counters
         context['sku_pair_in_order_counters'] = stats.sku_pair_in_order_counters
+        context['suggestions'] = stats.suggestions
 
         return self.render_to_response(context)

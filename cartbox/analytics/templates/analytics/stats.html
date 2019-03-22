@@ -27,6 +27,14 @@
             <dt>Probability of order containing SKU 1 given SKU 2</dt>
             <dd>{{ both_over_total2|as_percent }}</dd>
         </dl>
+        <h2>Suggestions</h2>
+        <ul>
+            {% for suggestion, total2 in suggestions %}
+                <li>
+                {% for value in suggestion %} {{ value }}{% endfor %}: {{ total2 }} / {{ total_both }}
+                </li>
+            {% endfor %}
+        </ul>
         <hr>
         <h2>Counters Used</h2>
         <p>(may be useful for debugging the stats)</p>

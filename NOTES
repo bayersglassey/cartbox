@@ -14,7 +14,7 @@ TODO:
 
     * Actually make suggestions.
 
-    * Change CharFields ('sku' etc) to ForeignKeys (to Product etc).
+    * Change CharFields ('sku' etc) to ForeignKeys (to Product etc)?
         The 'cart' app is part of CartBox -- just usually people won't
         use the built-in e-commerce interface, they'll populate the data
         from an external source.
@@ -25,6 +25,9 @@ TODO:
         So 'suggested' means: *at least one of the order's items* was
         a suggested item.
 
+    * Add "By User" checkbox to the various analytics Forms, so you can
+        choose whether to see "suggested for you" or "customers also bought".
+
 
 ISSUES:
 
@@ -33,16 +36,13 @@ ISSUES:
         skus and suggested_skus to the template so it can render
         <option selected>s all over the place. You know?
 
-    * Getting statistics for categories isn't actually possible with
-        current setup.
-        See Order.process_analytics.
-        We would need a different type of counter which tracked sku
-        against category, and another type for category against
-        category.
+        Actually, we could just use forms.ChoiceField...
+        [
+            (None, '-'),
+            (True, 'Yes'),
+            (False, 'No'),
+        ]
 
-    * Since there's no thing as a cart, there's no way to make
-        suggestions in the way we were planning!..
-        Ok, so add a button to "shop" page which says "update cart"
-        or whatever. Really it just refreshes suggested products.
-
+        Or does forms.BooleanField allow something fancy with empty_values
+        or whatever?..
 

@@ -8,9 +8,15 @@ from .stats import Stats
 
 class AnalyticsTestCase(CartTestCaseMixin, TestCase):
 
-    def test_swap_keys_1_2(self):
+    def test_swap_keys(self):
+        keys = ['sku1', 'abc', 'sku2', '222']
+        swapped_keys = utils.swap_keys(keys)
+        self.assertEqual(swapped_keys,
+            ['sku2', 'abc', 'sku1', '221'])
+
+    def test_swap_dict_keys(self):
         d = {'a1': 10, 'a2': 20, 'x1': 30}
-        utils.swap_keys_1_2(d)
+        utils.swap_dict_keys(d)
         self.assertEqual(d, {'a2': 10, 'a1': 20, 'x1': 30})
 
     def test_normalize_sku_pair_keys_no_swap(self):
@@ -20,7 +26,7 @@ class AnalyticsTestCase(CartTestCaseMixin, TestCase):
             'sku1': 'AAA', 'cat1': 'Fruit',
             'sku2': 'BBB', 'cat2': 'Veg',
         }
-        normalize_sku_pair_keys(d)
+        utils.normalize_sku_pair_keys(d)
         self.assertEqual(d, {
             'user': 'q',
             'sku1': 'AAA', 'cat1': 'Fruit',
@@ -65,6 +71,24 @@ class AnalyticsTestCase(CartTestCaseMixin, TestCase):
         # SKUPairInOrderCounter.__str__
         counter = stats.sku_pair_in_order_counters[0]
         str(counter)
+
+    def test_suggestions(self):
+        order1 = self.user.place_order([self.banana, self.apple, self.beef])
+        order2 = self.user.place_order([self.banana, self.apple])
+
+        stats = Stats(self.user.id, sku1=self.banana.sku)
+        suggestions = stats.suggestions
+        self.assertEqual(suggestions, [
+            ((self.apple.sku,), 2),
+            ((self.beef.sku,), 1),
+        ])
+
+        stats = Stats(self.user.id, sku1=self.apple.sku)
+        suggestions = stats.suggestions
+        self.assertEqual(suggestions, [
+            ((self.banana.sku,), 2),
+            ((self.beef.sku,), 1),
+        ])
 
     def test_add_sku_pair_in_order(self):
         utils.add_sku_pair_in_order(self.user.id,
