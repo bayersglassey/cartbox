@@ -136,7 +136,7 @@ just as God intended.
 
 ## The REST API
 
-TODO: Implement with Django REST Framework.
+Under construction!
 It should work something like this:
 
 List all orders:
