@@ -16,6 +16,11 @@ but the idea is to populate the database from an external source using
 (for example) a REST API.
 
 
+## Screenshot
+
+![Shop](/screenshots/shop.png)
+
+
 ## The E-Commerce Model
 
 * _Categories_ have a title and a set of _products_
