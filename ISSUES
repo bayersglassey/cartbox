@@ -1,0 +1,28 @@
+
+What is up with the following?
+It seems to me like 4101 and 4011 should both have 3 / 4.
+So why is 4011 only 1 / 4?..
+
+
+    Suggestions
+
+        4101: 3 / 4
+        4011: 1 / 4
+
+    SKU 1 in Order
+
+        1 x (210027) Beef Ribs (Meat)
+        2 x (4101) Apple Braeburn (Fruit)
+        2 x (4011) Banana Yellow (Fruit)
+
+    SKU 2 in Order
+
+        1 x (210027) Beef Ribs (Meat)
+        2 x (4101) Apple Braeburn (Fruit)
+        2 x (4011) Banana Yellow (Fruit)
+
+    Both SKUs in Order
+
+        2 x (4011) Banana Yellow (Fruit) | (4101) Apple Braeburn (Fruit)
+        1 x (210027) Beef Ribs (Meat) | (4101) Apple Braeburn (Fruit)
+        1 x (210027) Beef Ribs (Meat) | (4011) Banana Yellow (Fruit)
