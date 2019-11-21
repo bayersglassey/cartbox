@@ -63,12 +63,16 @@ class Order(models.Model):
         return "{} {}".format(self.__class__.__name__, id_msg)
 
     def add_item(self, product, **kwargs):
+        """Returns a new OrderItem in self.items"""
+        assert not self.placed
         return self.items.create(
             sku=product.sku, title=product.title,
             category=product.category,
             **kwargs)
 
     def items_by_category(self):
+        """Returns dict mapping Categories to lists of OrderItem from
+        self.items"""
         items_by_category = defaultdict(list)
         for item in self.items.all():
             items_by_category[item.category].append(item)
@@ -78,19 +82,43 @@ class Order(models.Model):
         return dict(items_by_category)
 
     def process_analytics(self):
+        """Examines self.items, creates counter objects and returns
+        them as a list.
+        Each counter object is either a SKUPairInOrderCounter or a
+        SKUInOrderCounter."""
 
         # Find all skus in order
         skus = {item.sku for item in self.items.all()}
 
-        # item_tuples: list of (sku, cat, suggested)
+        # Build item_tuples: list of (sku, cat, suggested)
         item_tuples = []
         for sku in skus:
-            cat = next(item.category_id
-                for item in self.items.all() if item.sku == sku)
-            suggested = any(item.suggested
-                for item in self.items.all() if item.sku == sku)
+
+            # NOTE: sku_items has length at least 1 since every
+            # sku in skus came from one of self's items.
+            sku_items = [item
+                for item in self.items.all() if item.sku == sku]
+
+            # KIND OF HACK: we arbitrarily choose first item to
+            # determine the category... but that should make sense,
+            # since item.sku comes from product.sku, so all items
+            # with the same sku presumably share the same product
+            # and therefore the same category.
+            # However, since we've cached product.category on item,
+            # it's possible for the category of product and items
+            # to get out of sync.
+            # So we should probably actually look up the product
+            # here and use its category_id instead of getting it
+            # off one of the items.
+            # (Was there a reason we did it this way instead?..
+            # hopefully not for... "efficiency"...)
+            cat = sku_items[0].category_id
+
+            suggested = any(item.suggested for item in sku_items)
             item_tuples.append((sku, cat, suggested))
 
+        # Build counters: list of freshly created counter objects,
+        # including SKUPairInOrderCounter and SKUInOrderCounter
         counters = []
         for i, (sku, cat, suggested) in enumerate(item_tuples):
             counter = analytics_utils.add_sku_in_order(
@@ -106,8 +134,11 @@ class Order(models.Model):
         return counters
 
     def place(self):
-        """Should be called after Order has been created, and its items
-        attached to it"""
+        """Places the order.
+        Should be called after all items have been attached to self.
+        Effects: modifies and saves self, and creates counter objects.
+        Returns None"""
+        assert not self.placed
         self.placed = True
         self.save()
         self.process_analytics()
