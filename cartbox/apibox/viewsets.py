@@ -1,27 +1,49 @@
 
-from rest_framework import viewsets
+from rest_framework import viewsets, response
+from rest_framework.decorators import action
+
+from cart.models import Product
 
 from . import serializers
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CategorySerializer
     queryset = serializer_class.Meta.model.objects.all()
+    search_fields = ['title']
 
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProductSerializer
     queryset = serializer_class.Meta.model.objects.all()
+    filter_fields = ['category']
+    search_fields = ['title']
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.OrderSerializer
     queryset = serializer_class.Meta.model.objects.all()
+    filter_fields = ['user']
 
-class OrderItemViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.OrderItemSerializer
-    queryset = serializer_class.Meta.model.objects.all()
+    @action(['post'], detail=False)
+    def place(self, request):
+        """Place a new order on POST"""
+
+        serializer = serializers.PlaceOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Place an order for indicated user
+        user = serializer.validated_data['user']
+        add_items = serializer.validated_data.get('add_items', [])
+        skus = [d['sku'] for d in add_items]
+        products = Product.objects.filter(sku__in=skus)
+        order = user.place_order(products)
+
+        # Return serialized order data
+        order_serializer = serializers.OrderSerializer(instance=order)
+        return response.Response(order_serializer.data, status=201)
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.UserSerializer
     queryset = serializer_class.Meta.model.objects.all()
+    search_fields = ['username', 'email', 'first_name', 'last_name']
 
 
 class SKUInOrderCounterViewSet(viewsets.ModelViewSet):

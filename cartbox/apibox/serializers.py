@@ -15,15 +15,36 @@ class ProductSerializer(serializers.ModelSerializer):
         model = cart_models.Product
         fields = '__all__'
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = cart_models.Order
-        fields = ['user', 'items']
-
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = cart_models.OrderItem
+        exclude = ['id', 'order']
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+    class Meta:
+        model = cart_models.Order
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Don't show items for orders in list view
+        view = self.context.get('view')
+        action = getattr(view, 'action', None)
+        if action == 'list':
+            self.fields.pop('items')
+
+class AddItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = cart_models.OrderItem
+        fields = ['sku']
+
+class PlaceOrderSerializer(serializers.ModelSerializer):
+    add_items = AddItemSerializer(many=True)
+    class Meta:
+        model = cart_models.Order
+        fields = ['user', 'add_items']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

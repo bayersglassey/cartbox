@@ -38,6 +38,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
     'PAGE_SIZE': 50,
 }
 
@@ -53,6 +57,7 @@ INSTALLED_APPS = [
     'cart',
     'analytics',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
