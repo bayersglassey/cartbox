@@ -140,19 +140,34 @@ E-commerce made simple! Pure HTML, no Javascript - just as God intended.
 
 ## The REST API
 
-Under construction!
-It should work something like this:
+The "official documentation" is just to use the OPTIONS HTTP method,
+or visit /api in your browser to see Django Rest Framework's excellent
+browseable API...
 
-List all orders:
+### Basic usage example
+
+#### List all users
+
+    GET /api/users/
+
+#### Create a user
+
+    POST /api/users/
+    {
+        "username": "joe",
+        "password": "s0 s3kre3t"
+    }
+
+#### List all orders
 
     GET /api/orders/
 
-Add an order:
+#### Place an order
 
-    POST /api/orders/
+    POST /api/orders/place
     {
-        "user": 10,
-        "items": [
+        "user": 1,
+        "add_items": [
             {
                 "sku": "4011"
             },
@@ -165,7 +180,7 @@ Add an order:
         ]
     }
 
-Get statistics:
+#### Get statistics
 
     GET /api/stats/?user=10&sku1=4011&sku2=210027
 
@@ -181,7 +196,7 @@ there is a 5/30 = 17% chance of also containing SKU 210027.
 Similarly, among orders which contain SKU 210027, there is a
 5/20 = 25% chance of also containing SKU 4011.
 
-Get suggestions:
+#### Get suggestions
 
     GET /api/suggestions/?user=10&sku1=4011&limit=3
 
