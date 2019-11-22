@@ -141,7 +141,10 @@ class Order(models.Model):
         assert not self.placed
         self.placed = True
         self.save()
-        self.process_analytics()
+        counters = self.process_analytics()
+
+        # Poke a secret attribute on self for testing purposes
+        self._placed_counters = counters
 
 
 class OrderItem(ProductInfo):

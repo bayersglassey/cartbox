@@ -1,5 +1,7 @@
 from django.test import TestCase, RequestFactory
 
+from analytics.models import SKUInOrderCounter, SKUPairInOrderCounter
+
 from .models import Category, Product, Order, CartUser
 from .default_data import (
     update_or_create_cats_and_prods, updated_or_created)
@@ -50,9 +52,55 @@ class CartTestCase(CartTestCaseMixin, TestCase):
     def test_order_place(self):
         order = self.user.place_order([self.banana, self.apple])
 
+        # We should get 3 counters:
+        #  <SKUInOrderCounter: 1 x 4011 1549>
+        #  <SKUInOrderCounter: 1 x 4101 1549>
+        #  <SKUPairInOrderCounter: 1 x 4011 1549 | 4101 1549>
+        counters = order._placed_counters
+        self.assertEqual(len(counters), 3)
+
+        # Check the SKUInOrderCounters
+        sku_counters = [c for c in counters
+            if isinstance(c, SKUInOrderCounter)]
+        self.assertEqual(len(sku_counters), 2)
+        banana_counters = [c for c in sku_counters
+            if c.sku == self.banana.sku]
+        self.assertEqual(len(banana_counters), 1)
+        apple_counters = [c for c in sku_counters
+            if c.sku == self.apple.sku]
+        self.assertEqual(len(apple_counters), 1)
+
+        # Check the SKUPairInOrderCounter
+        sku_pair_counters = [c for c in counters
+            if isinstance(c, SKUPairInOrderCounter)]
+        self.assertEqual(len(sku_pair_counters), 1)
+        sku_pair_counter = sku_pair_counters[0]
+        # Note: SKUPairInOrderCounter guarantees sku1 < sku2.
+        # banana.sku is "4011", apple.sku is "4101".
+        # So sku1 should be banana, sku2 should be apple.
+        self.assertEqual(sku_pair_counter.sku1, self.banana.sku)
+        self.assertEqual(sku_pair_counter.sku2, self.apple.sku)
+
+        with self.assertRaises(AssertionError):
+            # Can't place an already-placed order
+            order.place()
+
     def test_order_items_by_category(self):
-        order = self.user.place_order([self.banana, self.apple])
+        order = self.user.place_order([self.banana, self.apple, self.beef])
         items_by_category = order.items_by_category()
+        self.assertEqual(set(items_by_category), {self.fruit, self.meat})
+
+        # Check fruit items
+        fruit_items = items_by_category[self.fruit]
+        self.assertEqual(len(fruit_items), 2)
+        self.assertEqual({i.sku for i in fruit_items},
+            {self.banana.sku, self.apple.sku})
+
+        # Check meat item
+        meat_items = items_by_category[self.meat]
+        self.assertEqual(len(meat_items), 1)
+        self.assertEqual({i.sku for i in meat_items},
+            {self.beef.sku})
 
     def test_misc(self):
         # Category.__str__
