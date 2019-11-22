@@ -14,6 +14,8 @@ router.register(r'analytics/counters/skus_in_order',
     viewsets.SKUInOrderCounterViewSet)
 router.register(r'analytics/counters/sku_pairs_in_order',
     viewsets.SKUPairInOrderCounterViewSet)
+router.register(r'analytics/stats',
+    viewsets.StatsViewSet, basename='stats')
 
 
 urlpatterns = [

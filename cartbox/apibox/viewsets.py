@@ -1,8 +1,9 @@
 
-from rest_framework import viewsets, response
+from rest_framework import views, viewsets, response
 from rest_framework.decorators import action
 
-from cart.models import Product
+from cart.models import Product, CartUser
+from analytics.stats import Stats
 
 from . import serializers
 
@@ -53,3 +54,22 @@ class SKUInOrderCounterViewSet(viewsets.ModelViewSet):
 class SKUPairInOrderCounterViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SKUPairInOrderCounterSerializer
     queryset = serializer_class.Meta.model.objects.all()
+
+class StatsViewSet(viewsets.ViewSet):
+    serializer_class = serializers.StatsSerializer
+
+    # This queryset isn't really used, but it allows
+    # DjangoModelPermissionsOrAnonReadOnly to look at this viewset
+    # without exploding.
+    # So, in order to view stats via the API, you need read permissions
+    # for the user model... seems reasonable.
+    queryset = CartUser.objects.all()
+
+    def list(self, request):
+        """Not really a list, but calling it so makes everything work with
+        the Router"""
+        serializer = self.serializer_class(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        stats = Stats(**serializer.data)
+        output_serializer = serializers.StatsOutputSerializer(stats)
+        return response.Response(output_serializer.data)

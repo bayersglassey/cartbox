@@ -55,9 +55,48 @@ class UserSerializer(serializers.ModelSerializer):
 class SKUInOrderCounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = analytics_models.SKUInOrderCounter
-        fields = '__all__'
+        exclude = ['id']
 
 class SKUPairInOrderCounterSerializer(serializers.ModelSerializer):
     class Meta:
         model = analytics_models.SKUPairInOrderCounter
-        fields = '__all__'
+        exclude = ['id']
+
+class StatsSerializer(serializers.Serializer):
+    """Serializer for the kwargs of the Stats class constructor"""
+    user = serializers.PrimaryKeyRelatedField(required=False,
+        queryset=cart_models.CartUser.objects.all())
+    sku1 = serializers.CharField(required=False)
+    sku2 = serializers.CharField(required=False)
+    cat1 = serializers.CharField(required=False)
+    cat2 = serializers.CharField(required=False)
+    suggested1 = serializers.BooleanField(required=False)
+    suggested2 = serializers.BooleanField(required=False)
+    limit = serializers.IntegerField(required=False)
+
+class StatsOutputSerializer(serializers.Serializer):
+    """Serializer for the attributes of the Stats class"""
+    total1 = serializers.IntegerField()
+    total2 = serializers.IntegerField()
+    total_both = serializers.IntegerField()
+    both_over_total1 = serializers.FloatField()
+    both_over_total2 = serializers.FloatField()
+    sku1_in_order_counters = SKUInOrderCounterSerializer(many=True)
+    sku2_in_order_counters = SKUInOrderCounterSerializer(many=True)
+    sku_pair_in_order_counters = SKUPairInOrderCounterSerializer(many=True)
+    suggestions = serializers.ListField()
+
+    def __init__(self, stats):
+        # Yes, __dict__ is fairly ganky, but it seems to make sense in
+        # this case, since the serializer is specifying the fields.
+        data = stats.__dict__.copy()
+
+        # stats.suggestions terrifies me, I do not remember why it has
+        # such a weird format.
+        # We transform it into something nicer before showing it to
+        # the user.
+        data["suggestions"] = [
+            {"sku": sku, "count": count}
+            for ((sku,), count) in stats.suggestions]
+
+        super().__init__(data)

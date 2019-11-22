@@ -148,11 +148,11 @@ browseable API...
 
 #### List all users
 
-    GET /api/users/
+    GET /api/cart/users/
 
 #### Create a user
 
-    POST /api/users/
+    POST /api/cart/users/
     {
         "username": "joe",
         "password": "s0 s3kre3t"
@@ -160,11 +160,11 @@ browseable API...
 
 #### List all orders
 
-    GET /api/orders/
+    GET /api/cart/orders/
 
 #### Place an order
 
-    POST /api/orders/place
+    POST /api/cart/orders/place
     {
         "user": 1,
         "add_items": [
@@ -180,49 +180,58 @@ browseable API...
         ]
     }
 
-#### Get statistics
+#### Get analytics
 
-    GET /api/stats/?user=10&sku1=4011&sku2=210027
-
-    200 OK
-    {
-        "total_sku1": 30,
-        "total_sku2": 20,
-        "total_both": 5
-    }
-
-...from this, we can say that among orders which contain SKU 4011,
-there is a 5/30 = 17% chance of also containing SKU 210027.
-Similarly, among orders which contain SKU 210027, there is a
-5/20 = 25% chance of also containing SKU 4011.
-
-#### Get suggestions
-
-    GET /api/suggestions/?user=10&sku1=4011&limit=3
+    GET /api/analytics/stats/?user=10&sku1=4011
 
     200 OK
     {
-        "total_sku1": 30,
+        "total1": 7,
+        "total2": 20,
+        "total_both": 11,
+        "both_over_total1": 1.5714285714285714,
+        "both_over_total2": 0.55,
+        "sku1_in_order_counters": [
+            {
+                "count": 1,
+                "user": "1",
+                "sku": "4011",
+                "cat": "1",
+                "suggested": true
+            },
+            ...
+        ],
+        "sku2_in_order_counters": [
+            {
+                "count": 1,
+                "user": "1",
+                "sku": "4051",
+                "cat": "1",
+                "suggested": false
+            },
+            ...
+        ],
+        "sku_pair_in_order_counters": [
+            {
+                "count": 4,
+                "user": "1",
+                "sku1": "210027",
+                "sku2": "4011",
+                "cat1": "3",
+                "cat2": "1",
+                "suggested1": false,
+                "suggested2": false
+            },
+            ...
+        ],
         "suggestions": [
             {
-                "sku2": "210027",
-                "total_both": 5
+                "count": 4,
+                "sku": "210027"
             },
-            {
-                "sku2": "4554",
-                "total_both": 2
-            },
-            {
-                "sku2": "4035",
-                "total_both": 1
-            }
+            ...
         ]
     }
-
-...from this, we can say that among orders which contain SKU 4011,
-there is a 5/30 = 17% chance of also containing SKU 210027, a
-2/30 = 7% chance of also containing SKU 4554, and a 1/30 = 3% chance
-of also containing SKU 4035.
 
 
 ## How to Deploy
